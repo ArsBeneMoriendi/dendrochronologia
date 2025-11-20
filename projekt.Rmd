@@ -1,0 +1,90 @@
+```{r}
+library(ncdf4)
+library(chron)
+library(lattice)
+library(RColorBrewer)
+library(zoo)
+library(animation)
+ncin<-nc_open("cru_ts4.09.1901.2024.tmp.dat.nc")
+ncin_p<-nc_open("cru_ts4.09.1901.2024.pre.dat.nc")
+
+
+```
+```{r}
+time <- ncvar_get(ncin,"time")
+tunits <- ncatt_get(ncin,"time","units")
+tustr <- strsplit(tunits$value, " ")
+tdstr <- strsplit(unlist(tustr)[3], "-")
+tmonth <- as.integer(unlist(tdstr)[2])
+tday <- as.integer(unlist(tdstr)[3])
+tyear <- as.integer(unlist(tdstr)[1])
+time_ch<-chron(time,origin=c(tmonth, tday, tyear))
+time_m_y<-as.yearmon(time_ch)
+Sys.setlocale("LC_TIME", "C")
+time_m_y<-as.yearmon(time_ch)
+time_id<-which(time_m_y=="Dec 1996")
+time <-time_m_y[1:time_id] #czas do klimatu
+tail(time)
+
+```
+
+```{r}
+tmp_array <- ncvar_get(ncin,"tmp")
+#tmp_array <- tmp_array[1:time_id]
+```
+
+
+
+```{r}
+lon <- ncvar_get(ncin,"lon")
+lon_id<-which(lon==14.75)
+lat <- ncvar_get(ncin,"lat")
+lat_id<-which(lat==57.75)
+pinus1_tmp <-tmp_array[lon_id,lat_id,]
+pinus1_tmp <-pinus1_tmp[1:time_id]
+
+lon <- ncvar_get(ncin,"lon")
+lon_id<-which(lon==18.75)
+lat <- ncvar_get(ncin,"lat")
+lat_id<-which(lat==64.75)
+pinus2_tmp <-tmp_array[lon_id,lat_id,]
+pinus2_tmp <-pinus2_tmp[1:time_id]
+
+lon <- ncvar_get(ncin,"lon")
+lon_id<-which(lon==21.75)
+lat <- ncvar_get(ncin,"lat")
+lat_id<-which(lat==67.75)
+pinus3_tmp <-tmp_array[lon_id,lat_id,]
+pinus3_tmp <-pinus3_tmp[1:time_id]
+
+
+```
+```{r}
+pinus1_tmp_matrix <- matrix(pinus1_tmp, ncol = 12, byrow = TRUE)
+head(pinus1_tmp_matrix)
+pinus1_tmp_df <- data.frame(rok=1901:1996, pinus1_tmp_matrix)
+colnames(pinus1_tmp_df) <- c("rok", "I", "II", "III", "IV", "V", "VI",
+"VII", "VIII", "IX", "X", "XI", "XII")
+pinus1_tmp_df<-round(pinus1_tmp_df, digits=1)
+
+pinus2_tmp_matrix <- matrix(pinus2_tmp, ncol = 12, byrow = TRUE)
+head(pinus2_tmp_matrix)
+pinus2_tmp_df <- data.frame(rok=1901:1996, pinus2_tmp_matrix)
+colnames(pinus2_tmp_df) <- c("rok", "I", "II", "III", "IV", "V", "VI",
+"VII", "VIII", "IX", "X", "XI", "XII")
+pinus2_tmp_df<-round(pinus1_tmp_df, digits=1)
+
+pinus3_tmp_matrix <- matrix(pinus3_tmp, ncol = 12, byrow = TRUE)
+head(pinus3_tmp_matrix)
+pinus3_tmp_df <- data.frame(rok=1901:1996, pinus1_tmp_matrix)
+colnames(pinus3_tmp_df) <- c("rok", "I", "II", "III", "IV", "V", "VI",
+"VII", "VIII", "IX", "X", "XI", "XII")
+pinus3_tmp_df<-round(pinus1_tmp_df, digits=1)
+```
+```{r}
+
+```
+
+
+
+

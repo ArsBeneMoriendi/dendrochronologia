@@ -1,0 +1,378 @@
+# Linderholm - Stortjäderberget - PISY - ITRDB SWED317
+#----------------------------------------------------
+#                World Data Service for Paleoclimatology, Boulder
+#                                  and
+#                     NOAA Paleoclimatology Program
+#             National Centers for Environmental Information (NCEI)
+#----------------------------------------------------
+# Template Version 4.0
+# Encoding: UTF-8
+# NOTE: Please cite original publication, NOAA Landing Page URL, dataset and publication DOIs (where available), and date accessed when using downloaded data. If there is no publication information, please cite investigator, study title, NOAA Landing Page URL, and date accessed.
+#
+# Description/Documentation lines begin with #
+# Data lines have no #
+#
+# NOAA_Landing_Page: https://www.ncei.noaa.gov/access/paleo-search/study/6140
+#   Landing_Page_Description: NOAA Landing Page of this file's parent study, which includes all study metadata.
+#
+# Study_Level_JSON_Metadata: https://www.ncei.noaa.gov/pub/data/metadata/published/paleo/json/noaa-tree-6140.json
+#   Study_Level_JSON_Description: JSON metadata of this data file's parent study, which includes all study metadata.
+#
+# Data_Type: Tree Ring
+#
+# Dataset_DOI:
+#
+# Science_Keywords: 
+#--------------------
+# Resource_Links
+#
+# Data_Download_Resource: https://www.ncei.noaa.gov/pub/data/paleo/treering/measurements/europe/swed317r-crn-noaa.txt
+#   Data_Download_Description: Raw Measurements - NOAA Template File; swed317r-crn-noaa.txt
+#
+# Related_Online_Resource: https://www.ncei.noaa.gov/pub/data/paleo/treering/chronologies/europe/swed317r.crn
+#   Related_Online_Description: CRN File; Chronology - Tucson Decadal File
+#
+#--------------------
+# Contribution_Date
+#   Date: 2008-06-05
+#--------------------
+# File_Last_Modified_Date
+#   Date: 2008-06-05
+#--------------------
+# Title
+#   Study_Name: Linderholm - Stortjäderberget - PISY - ITRDB SWED317
+#--------------------
+# Investigators
+#   Investigators: Linderholm, H.W.(https://orcid.org/0000-0002-1522-8919)
+#--------------------
+# Description_Notes_and_Keywords
+#   Description: NOAA Template Chronology file added 2018-12-19. NOAA Template Raw Measurements file added 2019-02-05.
+#--------------------
+# Publication
+#   Authors: 
+#   Journal_Name: 
+#   Published_Title: 
+#   Published_Date_or_Year: 
+#   Volume: 
+#   Pages: 
+#   Issue: 
+#   Report_Number: 
+#   DOI: 
+#   Full_Citation: 
+#   Abstract: 
+#--------------------
+# Funding_Agency
+#   Funding_Agency_Name:
+#   Grant:
+#--------------------
+# Site_Information
+#   Site_Name: Stortjäderberget
+#   Location: Sweden
+#   Northernmost_Latitude: 64.53
+#   Southernmost_Latitude: 64.53
+#   Easternmost_Longitude: 19.0
+#   Westernmost_Longitude: 19.0
+#   Elevation_m: 290
+#--------------------
+# Data_Collection
+#   Collection_Name: SWED317
+#   First_Year: 1724
+#   Last_Year: 1998
+#   Time_Unit: CE
+#   Core_Length_m:
+#   Parameter_Keywords:  ring width
+#   Notes: None
+#--------------------
+# Species
+#   Species_Name: Pinus sylvestris L.
+#   Common_Name: Scots pine
+#   Tree_Species_Code: PISY
+#--------------------
+# Variables
+#
+# PaST_Thesaurus_Download_Resource: https://www.ncei.noaa.gov/access/paleo-search/skos/past-thesaurus.rdf
+#   PaST_Thesaurus_Download_Description: Paleoenvironmental Standard Terms (PaST) Thesaurus terms, definitions, and relationships in SKOS format.
+#
+# Data variables follow that are preceded by '##' in columns one and two.
+# Variables format: shortname-tab-var components: what, material, error, units, seasonality, data type, detail, method, C or N for Character or Numeric data)
+#
+## age_CE	age,,,year Common Era,,tree ring,,,N,
+## trsgi	tree ring standardized growth index,,,,,tree ring,composited,standard chronology method,N,
+## numsamp	number of samples,,,count,,tree ring,,,N,
+#---------------------
+# Data:
+# Missing_Values: NA
+age_CE	trsgi	numsamp
+1726	1.036	1
+1727	0.648	1
+1728	0.92	1
+1729	0.794	1
+1730	1.262	1
+1731	1.229	1
+1732	0.865	1
+1733	1.031	1
+1734	0.989	1
+1735	0.531	1
+1736	1.386	1
+1737	1.22	1
+1738	1.049	2
+1739	1.249	2
+1740	0.932	2
+1741	0.547	2
+1742	1.082	2
+1743	1.283	2
+1744	1.327	2
+1745	0.55	2
+1746	0.754	2
+1747	0.742	2
+1748	1.108	2
+1749	0.965	2
+1750	1.231	2
+1751	1.32	2
+1752	1.387	2
+1753	0.731	2
+1754	1.097	2
+1755	0.961	2
+1756	1.026	2
+1757	1.18	2
+1758	1.267	2
+1759	1.352	2
+1760	1.336	2
+1761	0.773	2
+1762	1.513	3
+1763	1.101	3
+1764	1.139	3
+1765	0.709	3
+1766	1.065	3
+1767	1.09	3
+1768	0.864	3
+1769	0.755	3
+1770	0.766	3
+1771	0.901	3
+1772	0.999	3
+1773	0.931	3
+1774	1.074	3
+1775	1.135	3
+1776	0.942	3
+1777	1.097	3
+1778	1.023	3
+1779	0.552	3
+1780	0.941	3
+1781	0.782	3
+1782	1.343	3
+1783	0.925	3
+1784	1.35	3
+1785	1.104	3
+1786	0.637	3
+1787	1.017	3
+1788	0.87	3
+1789	1.005	3
+1790	0.856	3
+1791	1.065	3
+1792	0.87	3
+1793	1.242	3
+1794	1.01	3
+1795	0.799	3
+1796	0.755	3
+1797	0.674	3
+1798	1.173	3
+1799	1.019	4
+1800	0.844	4
+1801	0.8	4
+1802	0.766	4
+1803	0.925	4
+1804	1.081	4
+1805	1.139	4
+1806	0.761	4
+1807	0.859	4
+1808	1.006	4
+1809	1.313	4
+1810	0.813	4
+1811	1.037	5
+1812	0.907	5
+1813	0.696	5
+1814	1.353	5
+1815	1.02	5
+1816	1.515	5
+1817	1.276	5
+1818	1.194	5
+1819	1.084	5
+1820	0.97	5
+1821	0.959	5
+1822	0.908	5
+1823	0.974	5
+1824	0.978	5
+1825	1.013	5
+1826	1.496	5
+1827	1.413	5
+1828	0.869	5
+1829	1.004	5
+1830	0.801	5
+1831	0.787	5
+1832	0.709	5
+1833	0.995	5
+1834	1.064	5
+1835	0.904	5
+1836	0.983	5
+1837	0.627	5
+1838	1.052	5
+1839	0.809	5
+1840	0.743	5
+1841	0.936	5
+1842	0.923	5
+1843	0.996	7
+1844	0.891	7
+1845	1.612	7
+1846	0.937	7
+1847	1.017	8
+1848	1.029	9
+1849	0.859	10
+1850	1.059	10
+1851	0.952	10
+1852	1.183	10
+1853	1.581	10
+1854	1.501	10
+1855	1.17	10
+1856	1.135	10
+1857	0.713	10
+1858	0.898	10
+1859	1.099	10
+1860	1.128	11
+1861	1.077	11
+1862	0.978	11
+1863	0.751	11
+1864	0.958	12
+1865	0.834	12
+1866	1.001	12
+1867	0.885	12
+1868	1.223	12
+1869	0.885	12
+1870	1.221	12
+1871	1.042	12
+1872	1.322	12
+1873	0.884	12
+1874	1.113	12
+1875	1.124	12
+1876	0.741	12
+1877	0.891	12
+1878	0.788	12
+1879	0.936	12
+1880	0.974	12
+1881	0.948	12
+1882	0.855	12
+1883	0.867	12
+1884	0.968	12
+1885	1.028	12
+1886	0.931	12
+1887	0.898	12
+1888	0.909	12
+1889	0.71	12
+1890	1.103	12
+1891	0.918	12
+1892	1.166	12
+1893	1.165	12
+1894	0.694	12
+1895	1.38	12
+1896	1.013	12
+1897	0.93	12
+1898	1.13	12
+1899	0.887	12
+1900	1.103	12
+1901	1.092	12
+1902	0.601	12
+1903	0.99	12
+1904	0.913	12
+1905	1.033	12
+1906	1.051	12
+1907	0.797	12
+1908	0.945	12
+1909	1.099	12
+1910	1.029	12
+1911	0.901	12
+1912	1.165	12
+1913	1.265	12
+1914	1.517	12
+1915	1.383	12
+1916	0.783	12
+1917	1.235	12
+1918	0.846	12
+1919	1.095	12
+1920	0.866	12
+1921	1.104	12
+1922	1.027	12
+1923	0.7	12
+1924	0.902	12
+1925	1.038	12
+1926	0.929	12
+1927	0.994	12
+1928	0.542	12
+1929	1.331	12
+1930	0.856	12
+1931	0.685	12
+1932	1.145	12
+1933	0.932	12
+1934	0.802	12
+1935	0.616	12
+1936	1.002	12
+1937	1.106	12
+1938	0.874	12
+1939	1.009	12
+1940	0.996	12
+1941	0.826	12
+1942	0.829	12
+1943	0.95	12
+1944	0.84	12
+1945	0.813	12
+1946	1.171	12
+1947	1.3	12
+1948	0.944	12
+1949	1.338	12
+1950	0.974	12
+1951	0.87	12
+1952	1.003	12
+1953	1.062	12
+1954	1.321	12
+1955	0.905	12
+1956	1.051	12
+1957	0.879	12
+1958	1.181	12
+1959	0.822	12
+1960	0.993	12
+1961	0.81	12
+1962	1.285	12
+1963	1.226	12
+1964	0.935	12
+1965	0.647	12
+1966	0.987	12
+1967	1.034	12
+1968	1.114	12
+1969	0.757	12
+1970	1.243	12
+1971	1.159	12
+1972	1.064	12
+1973	1.02	12
+1974	0.936	12
+1975	1.066	12
+1976	1.442	12
+1977	0.77	12
+1978	1.117	12
+1979	1.226	12
+1980	0.776	12
+1981	1.023	12
+1982	0.988	12
+1983	1.083	12
+1984	1.199	12
+1985	1.053	12
+1986	1.133	12
+1987	0.896	12
+1988	0.773	12
+1989	1.338	12
+1990	0.816	12
+1991	0.911	12
+1992	1.11	12
+1993	0.653	12
+1994	1.042	12
+1995	0.908	12
+1996	0.967	12
+1997	0.808	12
+1998	0.867	12
