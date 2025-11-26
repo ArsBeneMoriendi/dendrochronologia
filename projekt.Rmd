@@ -8,11 +8,14 @@ library(lattice)
 library(RColorBrewer)
 library(zoo)
 library(animation)
+library(berryFunctions)
+library(patchwork)
 ncin<-nc_open("cru_ts4.09.1901.2024.tmp.dat.nc")
 ncin_p<-nc_open("cru_ts4.09.1901.2024.pre.dat.nc")
 
 
 ```
+
 ```{r}
 time <- ncvar_get(ncin,"time")
 tunits <- ncatt_get(ncin,"time","units")
@@ -28,39 +31,6 @@ time_m_y<-as.yearmon(time_ch)
 time_id<-which(time_m_y=="Dec 1996")
 time <-time_m_y[1:time_id] #czas do klimatu
 tail(time)
-
-```
-
-```{r}
-##################DAWNE###################
-# tmp_array <- ncvar_get(ncin,"tmp")
-# #tmp_array <- tmp_array[1:time_id]
-```
-
-
-
-```{r}
-# lon <- ncvar_get(ncin,"lon")
-# lon_id<-which(lon==14.75)
-# lat <- ncvar_get(ncin,"lat")
-# lat_id<-which(lat==57.75)
-# pinus1_tmp <-tmp_array[lon_id,lat_id,]
-# pinus1_tmp <-pinus1_tmp[1:time_id]
-# 
-# lon <- ncvar_get(ncin,"lon")
-# lon_id<-which(lon==18.75)
-# lat <- ncvar_get(ncin,"lat")
-# lat_id<-which(lat==64.75)
-# pinus2_tmp <-tmp_array[lon_id,lat_id,]
-# pinus2_tmp <-pinus2_tmp[1:time_id]
-# 
-# lon <- ncvar_get(ncin,"lon")
-# lon_id<-which(lon==21.75)
-# lat <- ncvar_get(ncin,"lat")
-# lat_id<-which(lat==67.75)
-# pinus3_tmp <-tmp_array[lon_id,lat_id,]
-# pinus3_tmp <-pinus3_tmp[1:time_id]
-
 
 ```
 
@@ -87,53 +57,112 @@ pinus3_pre<-ncvar_get(ncin_p,"pre",start=c(lon_id,lat_id,1),count=c(1,1,time_id)
 ```
 
 ```{r}
-pinus1_tmp_matrix <- matrix(pinus1_tmp, ncol = 12, byrow = TRUE)
-head(pinus1_tmp_matrix)
-pinus1_tmp_df <- data.frame(rok=1901:1996, pinus1_tmp_matrix)
-colnames(pinus1_tmp_df) <- c("rok", "I", "II", "III", "IV", "V", "VI",
-"VII", "VIII", "IX", "X", "XI", "XII")
-pinus1_tmp_df<-round(pinus1_tmp_df, digits=1)
+make_1901_1996_df <- function(vec) {
+  mat <- matrix(vec, ncol = 12, byrow = TRUE)
+  df <- data.frame(rok=1901:1996, mat)
+  colnames(df) <- c("rok", "I", "II", "III", "IV", "V", "VI",
+      "VII", "VIII", "IX", "X", "XI", "XII")
+  df <- round(df, digits=1)
+  
+  return(df)
+}
 
-pinus2_tmp_matrix <- matrix(pinus2_tmp, ncol = 12, byrow = TRUE)
-head(pinus2_tmp_matrix)
-pinus2_tmp_df <- data.frame(rok=1901:1996, pinus2_tmp_matrix)
-colnames(pinus2_tmp_df) <- c("rok", "I", "II", "III", "IV", "V", "VI",
-"VII", "VIII", "IX", "X", "XI", "XII")
-pinus2_tmp_df<-round(pinus1_tmp_df, digits=1)
+list_tmp_1901_1996_df <- lapply(list(pinus1_tmp, pinus2_tmp, pinus3_tmp), make_1901_1996_df)
+#teraz np.pinus1_tmp_df to lista_tmp_df[[1]]
 
-pinus3_tmp_matrix <- matrix(pinus3_tmp, ncol = 12, byrow = TRUE)
-head(pinus3_tmp_matrix)
-pinus3_tmp_df <- data.frame(rok=1901:1996, pinus1_tmp_matrix)
-colnames(pinus3_tmp_df) <- c("rok", "I", "II", "III", "IV", "V", "VI",
-"VII", "VIII", "IX", "X", "XI", "XII")
-pinus3_tmp_df<-round(pinus1_tmp_df, digits=1)
+list_pre_1901_1996_df <- lapply(list(pinus1_pre, pinus2_pre, pinus3_pre), make_1901_1996_df)
+
 ```
+
+
 ```{r}
-pinus1_pre_matrix <- matrix(pinus1_pre, ncol = 12, byrow = TRUE)
-#head(pinus1_pre_matrix)
-pinus1_pre_df <- data.frame(rok=1901:1996, pinus1_pre_matrix)
-colnames(pinus1_pre_df) <- c("rok", "I", "II", "III", "IV", "V", "VI",
-"VII", "VIII", "IX", "X", "XI", "XII")
-pinus1_pre_df<-round(pinus1_pre_df, digits=1)
-
-pinus2_pre_matrix <- matrix(pinus2_pre, ncol = 12, byrow = TRUE)
-#head(pinus2_pre_matrix)
-pinus2_pre_df <- data.frame(rok=1901:1996, pinus2_pre_matrix)
-colnames(pinus2_pre_df) <- c("rok", "I", "II", "III", "IV", "V", "VI",
-"VII", "VIII", "IX", "X", "XI", "XII")
-pinus2_pre_df<-round(pinus1_pre_df, digits=1)
-
-pinus3_pre_matrix <- matrix(pinus3_pre, ncol = 12, byrow = TRUE)
-#head(pinus3_pre_matrix)
-pinus3_pre_df <- data.frame(rok=1901:1996, pinus1_pre_matrix)
-colnames(pinus3_pre_df) <- c("rok", "I", "II", "III", "IV", "V", "VI",
-"VII", "VIII", "IX", "X", "XI", "XII")
+make_30_years_df <- function(dataframe, start_year) {
+  df <- colMeans(dataframe[dataframe$rok >= start_year & dataframe$rok <= (start_year+29), -1], na.rm = TRUE)
+  return(df)
+}
+list_tmp_1901_1930 <- lapply(list_tmp_1901_1996_df,make_30_years_df,start_year=1901)
+list_tmp_1967_1996 <- lapply(list_tmp_1901_1996_df,make_30_years_df,start_year=1967)
+list_pre_1901_1930 <- lapply(list_pre_1901_1996_df,make_30_years_df,start_year=1901)
+list_pre_1967_1996 <- lapply(list_pre_1901_1996_df,make_30_years_df,start_year=1967)
 ```
 
 ```{r}
+miesiace <- names(list_pre_1901_1930[[1]])
+
+make_climate_30_years_df <- function(df_tmp, df_pre) {
+  df <- data.frame(
+    miesiac = factor(miesiace, levels = miesiace),
+    temperatura = as.numeric(round(df_tmp, digits=1)),
+    opady = as.numeric(round(df_pre, digits=1)))
+    
+  return(df)
+}
+
+list_climate_1901_1930_df <- mapply(make_climate_30_years_df, list_tmp_1901_1930, list_pre_1901_1930,SIMPLIFY = FALSE)
+list_climate_1967_1996_df <- mapply(make_climate_30_years_df, list_tmp_1967_1996, list_pre_1967_1996, SIMPLIFY = FALSE)
+
+View(list_climate_1901_1930_df[[1]])
 
 ```
 
+```{r}
+make_climate_graph <- function(df, title) {
+  climateGraph(
+  temp = df$temperatura,
+  rain = df$opady,
+  labs = levels(df$miesiac),
+  main = title,
+  coltemp = "red",
+  colrain = "blue"
+)
+}
+
+titles_1901_1930 <- c(
+  "Okres 1901–1930 - pinus1",
+  "Okres 1901–1930 – pinus2",
+  "Okres 1901–1930 – pinus3"
+)
+
+titles_1967_1996 <- c(
+  "Okres 1967-1996 - pinus1",
+  "Okres 1967-1996 – pinus2",
+  "Okres 1967-1996 – pinus3"
+)
+
+mapply(make_climate_graph,list_climate_1901_1930_df, titles_1901_1930 )
+mapply(make_climate_graph,list_climate_1967_1996_df, titles_1967_1996 )
+  
+```
+
+```{r}
+#PORÓWNANIE KLIMATU - robocze
+pinus1_sr_2okresy <- data.frame(
+miesiąc = factor(miesiace, levels = miesiace),
+tmp1901_1930 = round(pinus1_sr_tmp_1901_1930, 1),
+tmp1967_1996 = round(pinus1_sr_tmp_1967_1996, 1),
+opady1901_1930 = round(pinus1_sr_pre_1901_1930, 1),
+opady1967_1996 = round(pinus1_sr_pre_1967_1996, 1))
 
 
+p1 <- ggplot(pinus1_sr_2okresy, aes(x = `miesiąc`, group = 1)) +
+geom_line(aes(y = tmp1901_1930, color = "1901–1930"), size = 1.1) +
+geom_point(aes(y = tmp1901_1930, color = "1901–1930"), size = 2) +
+geom_line(aes(y = tmp1967_1996, color = "1967–1996"), size = 1.1) +
+geom_point(aes(y = tmp1967_1996, color = "1967–1996"), size = 2) +
+labs(y = "Temperatura [°C]", x = "Miesiąc", color = "Okres") +
+scale_color_manual(values = c("1901–1930" = "orange", "1967–1996" = "darkred")) +
+theme_minimal()
+
+p2 <- ggplot(pinus1_sr_2okresy, aes(x = `miesiąc`)) +
+geom_col(aes(y = opady1901_1930, fill = "1901–1930"),
+position = position_nudge(x = -0.2), width = 0.4) +
+geom_col(aes(y = opady1967_1996, fill = "1967–1996"),
+position = position_nudge(x = 0.2), width = 0.4) +
+scale_fill_manual(values = c("1901–1930" = "skyblue", "1967–1996" = "blue")) +
+labs(y = "Opady [mm]", x = "Miesiąc", fill = "Okres") +
+theme_minimal()
+
+klimatogram2 <- p1 / p2 + plot_layout(heights = c(1, 1))
+klimatogram2
+```
 
