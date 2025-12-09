@@ -31,7 +31,6 @@ time_m_y<-as.yearmon(time_ch)
 time_id<-which(time_m_y=="Dec 1996")
 time <-time_m_y[1:time_id] #czas do klimatu
 tail(time)
-
 ```
 
 
@@ -222,4 +221,95 @@ for (n in 1:3) {
 
 ```
 
+
+```{r}
+library(dplR)
+
+class(swed314r.crn.noaa) <- c("crn", "data.frame")
+colnames(swed314r.crn.noaa)<-c("res","samp.depth")
+
+class(swed317r.crn.noaa) <- c("crn", "data.frame")
+colnames(swed317r.crn.noaa)<-c("res","samp.depth")
+
+class(swed319r.crn.noaa) <- c("crn", "data.frame")
+colnames(swed319r.crn.noaa)<-c("res","samp.depth")
+
+
+
+
+plot(swed314r.crn.noaa)
+plot(swed317r.crn.noaa)
+plot(swed319r.crn.noaa)
+plot(swed314r.crn.noaa, add.spline = TRUE, nyrs = 20)
+plot(swed317r.crn.noaa, add.spline = TRUE, nyrs = 20)
+plot(swed319r.crn.noaa, add.spline = TRUE, nyrs = 20)
+
+```
+
+```{r}
+#Dane klimatyczne dla lokalizacji chronologii
+tmp_matrix_pinus1 <- matrix(pinus1_tmp, ncol = 12, byrow = TRUE)
+tmp_matrix_pinus2 <- matrix(pinus2_tmp, ncol = 12, byrow = TRUE)
+tmp_matrix_pinus3 <- matrix(pinus3_tmp, ncol = 12, byrow = TRUE)
+
+
+tmp_pinus1_df <- data.frame(rok=1901:1996, tmp_matrix_pinus1)
+tmp_pinus2_df <- data.frame(rok=1901:1996, tmp_matrix_pinus2)
+tmp_pinus3_df <- data.frame(rok=1901:1996, tmp_matrix_pinus3)
+
+lapply(
+        list(tmp_pinus1_df,tmp_pinus2_df,tmp_pinus3_df), 
+       \(df){ #funkcja anonimowa
+            colnames(df) <- c("rok", "I", "II", "III", "IV", "V", "VI","VII", "VIII", "IX", "X", "XI", "XII") 
+            df<-round(df, digits=1)
+            View(df)
+            boxplot(df[,2:13], border="blue", col="orange", main="Rozkład temperatur", xlab="miesiące", ylab="tmp [st.C]")
+        }
+      )
+```
+
+
+```{r}
+#install.packages("treeclim")
+#install.packages("lubridate")
+library(treeclim)
+library(dplyr)
+library(lubridate)
+
+year<-year(time_m_y[1:time_id])
+month<-rep(seq(1,12),length(unique(year)))
+clim_tmp_pinus1<-data.frame(year,month,pinus1_tmp)
+tail(clim_tmp_pinus1)
+
+pinus1_chron<-select(swed314r.crn.noaa,-samp.depth)
+head(pinus1_chron)
+
+#korelacja stacjonarna
+pinus1_stat<-dcc(pinus1_chron, clim_tmp_pinus1, selection = -5:9, method = "correlation")
+plot(pinus1_stat)
+
+#korelacja ruchoma
+pinus1_moving<-dcc(pinus1_chron, clim_tmp_pinus1, selection = -5:9, method = "correlation", dynamic = "moving", win_size = 34, timespan=c(1901,1996))
+plot(pinus1_moving)
+```
+```{r}
+#install.packages("segmented")
+library(segmented)
+mapply(
+       \(tmp_df,title)
+        {
+          df <- data.frame(rok = tmp_df$rok,tmp = tmp_df$X12)
+          df<-slice(df, 1:98)
+          
+          fit_lm <- lm(tmp ~ rok, data = df)
+         
+          fit_segmented1 <- segmented(fit_lm, seg.Z = ~rok, npsi = 1) 
+          summary(fit_segmented1)
+          plot(fit_segmented1, ylim=c(-25,5), main= paste("tmp grudzień",title, sep=" - "))
+          lines(df$rok, df$tmp)
+          lines.segmented(fit_segmented1)
+          points.segmented(fit_segmented1)
+        },list(tmp_pinus1_df,tmp_pinus2_df,tmp_pinus3_df),list("pinus 1","pinus 2","pinus 3")
+       )
+```
 
