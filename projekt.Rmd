@@ -257,14 +257,16 @@ tmp_pinus1_df <- data.frame(rok=1901:1996, tmp_matrix_pinus1)
 tmp_pinus2_df <- data.frame(rok=1901:1996, tmp_matrix_pinus2)
 tmp_pinus3_df <- data.frame(rok=1901:1996, tmp_matrix_pinus3)
 
-lapply(
-        list(tmp_pinus1_df,tmp_pinus2_df,tmp_pinus3_df), 
-       \(df){ #funkcja anonimowa
+mapply(
+       \(df,name){ #funkcja anonimowa
             colnames(df) <- c("rok", "I", "II", "III", "IV", "V", "VI","VII", "VIII", "IX", "X", "XI", "XII") 
             df<-round(df, digits=1)
             View(df)
-            boxplot(df[,2:13], border="blue", col="orange", main="Rozkład temperatur", xlab="miesiące", ylab="tmp [st.C]")
-        }
+            boxplot(df[,2:13], border="blue", col="orange" ,main= paste("Rozkład temperatur",name,sep = " - "),
+                    xlab="miesiące", ylab="tmp [st.C]")
+        },
+       list(tmp_pinus1_df,tmp_pinus2_df,tmp_pinus3_df),
+       list("pinus 1","pinus 2","pinus 3")
       )
 ```
 
@@ -278,19 +280,36 @@ library(lubridate)
 
 year<-year(time_m_y[1:time_id])
 month<-rep(seq(1,12),length(unique(year)))
-clim_tmp_pinus1<-data.frame(year,month,pinus1_tmp)
-tail(clim_tmp_pinus1)
 
-pinus1_chron<-select(swed314r.crn.noaa,-samp.depth)
-head(pinus1_chron)
+mapply(\(temp_df,pinus_data,name){
+  
+  clim_tmp_pinus<-data.frame(year,month,temp_df)
 
-#korelacja stacjonarna
-pinus1_stat<-dcc(pinus1_chron, clim_tmp_pinus1, selection = -5:9, method = "correlation")
-plot(pinus1_stat)
+  pinus_chron<-select(pinus_data,-samp.depth)
 
-#korelacja ruchoma
-pinus1_moving<-dcc(pinus1_chron, clim_tmp_pinus1, selection = -5:9, method = "correlation", dynamic = "moving", win_size = 34, timespan=c(1901,1996))
-plot(pinus1_moving)
+  #korelacja stacjonarna
+  pinus_stat<-dcc(pinus_chron, clim_tmp_pinus, selection = -5:9, method = "correlation")
+  plot(pinus_stat)
+  
+  #korelacja ruchoma
+  pinus_moving<-dcc(pinus_chron, clim_tmp_pinus, selection = -5:9, method = "correlation", 
+                     dynamic = "moving", win_size = 34,timespan=c(1901,1996))
+
+  rn <- rownames(pinus_moving$coef$coef)
+
+  rn <- gsub("temp_df.curr.", "Current ", rn)
+  rn <- gsub("temp_df.prev.", "Previous ", rn)
+  rn <- gsub("\\.", " ", rn)
+  
+  rownames(pinus_moving$coef$coef) <- rn
+  plot(pinus_moving)
+  #,main= paste("Analiza korelacji w ruchomym oknie",name,sep = " - ")
+  
+},list(pinus1_tmp,pinus2_tmp,pinus3_tmp),
+list(swed314r.crn.noaa,swed317r.crn.noaa,swed319r.crn.noaa),
+list("pinus 1","pinus2","pinus 3"))
+
+
 ```
 ```{r}
 #install.packages("segmented")
