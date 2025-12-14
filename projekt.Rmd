@@ -7,9 +7,10 @@ library(chron)
 library(lattice)
 library(RColorBrewer)
 library(zoo)
-library(animation)
 library(berryFunctions)
 library(patchwork)
+
+#Poniżej wczytano dane średnich temperatur miesięcznych i opadów
 ncin<-nc_open("cru_ts4.09.1901.2024.tmp.dat.nc")
 ncin_p<-nc_open("cru_ts4.09.1901.2024.pre.dat.nc")
 
@@ -35,20 +36,23 @@ tail(time)
 
 
 ```{r}
-#NOWE
+#
 lon <- ncvar_get(ncin,"lon")
 lat <- ncvar_get(ncin,"lat")
 
+#pierwsza lokalizacja ma współrzędne 57.85N, 14.63E, więc najbliższy punkt siatki to 57.75N, 14.75E
 lon_id<-which(lon==14.75)
 lat_id<-which(lat==57.75)
 pinus1_tmp<-ncvar_get(ncin,"tmp",start=c(lon_id,lat_id,1),count=c(1,1,time_id))
 pinus1_pre<-ncvar_get(ncin_p,"pre",start=c(lon_id,lat_id,1),count=c(1,1,time_id))
 
+#pierwsza lokalizacja ma współrzędne 64.53N, 19.0E, więc najbliższy punkt siatki to 64.75N, 18.75E
 lon_id<-which(lon==18.75)
 lat_id<-which(lat==64.75)
 pinus2_tmp<-ncvar_get(ncin,"tmp",start=c(lon_id,lat_id,1),count=c(1,1,time_id))
 pinus2_pre<-ncvar_get(ncin_p,"pre",start=c(lon_id,lat_id,1),count=c(1,1,time_id))
 
+#pierwsza lokalizacja ma współrzędne 67.63N, 21.77E, więc najbliższy punkt siatki to 67.75N, 21.75E
 lon_id<-which(lon==21.75)
 lat_id<-which(lat==67.75)
 pinus3_tmp<-ncvar_get(ncin,"tmp",start=c(lon_id,lat_id,1),count=c(1,1,time_id))
@@ -56,6 +60,8 @@ pinus3_pre<-ncvar_get(ncin_p,"pre",start=c(lon_id,lat_id,1),count=c(1,1,time_id)
 ```
 
 ```{r}
+
+#funkcja do utworzenia dateframe zawierającego dane dla każdego miesiąca dla lat 1901-1996
 make_1901_1996_df <- function(vec) {
   mat <- matrix(vec, ncol = 12, byrow = TRUE)
   df <- data.frame(rok=1901:1996, mat)
@@ -66,29 +72,37 @@ make_1901_1996_df <- function(vec) {
   return(df)
 }
 
+#Używamy lapply, aby dla każdej lokalizacji utworzyć dataframe zawierający średnie miesięczne temperatury
 list_tmp_1901_1996_df <- lapply(list(pinus1_tmp, pinus2_tmp, pinus3_tmp), make_1901_1996_df)
-#teraz np.pinus1_tmp_df to lista_tmp_df[[1]]
 
+#tak samo dla opadów - otrzymujemy listę, która zawiera 3 dataframe'y z danymi opadowymi dla każdej lokalizacji
 list_pre_1901_1996_df <- lapply(list(pinus1_pre, pinus2_pre, pinus3_pre), make_1901_1996_df)
 
-View(list_tmp_1901_1996_df[[1]])
+View(list_pre_1901_1996_df[[1]])
 ```
 
 
 ```{r}
+#funkcja, która wycina 30-letni fragment z dataframe i tworzy z niego nowy dataframe
 make_30_years_df <- function(dataframe, start_year) {
   df <- colMeans(dataframe[dataframe$rok >= start_year & dataframe$rok <= (start_year+29), -1], na.rm = TRUE)
   return(df)
 }
+
+#funkcja wywoływana jest 4 razy za pomocą lapply, aby utworzyć dla każdej z 3 kolalizacji 4 dataframe'y - 2 z temperaturami i 2 z opadami
 list_tmp_1901_1930 <- lapply(list_tmp_1901_1996_df,make_30_years_df,start_year=1901)
 list_tmp_1967_1996 <- lapply(list_tmp_1901_1996_df,make_30_years_df,start_year=1967)
 list_pre_1901_1930 <- lapply(list_pre_1901_1996_df,make_30_years_df,start_year=1901)
 list_pre_1967_1996 <- lapply(list_pre_1901_1996_df,make_30_years_df,start_year=1967)
+
+View(list_pre_1901_1930[[1]])
 ```
 
 ```{r}
+#zapisujem do zmiennej nazwy kolumn - miesięce ("I", "II", ...)
 miesiace <- names(list_pre_1901_1930[[1]])
 
+#funkcja, w któej tworzony jest dataframe zawierający kolumny: miesiąc, średnia temperatura, średnia suma opadów w tym miesiącu
 make_climate_30_years_df <- function(df_tmp, df_pre) {
   df <- data.frame(
     miesiac = factor(miesiace, levels = miesiace),
@@ -98,14 +112,16 @@ make_climate_30_years_df <- function(df_tmp, df_pre) {
   return(df)
 }
 
+#używamy powyższej funkcji, otrzymując dane do klimatogramów dla lat 1901-1930 i 1967-1996
 list_climate_1901_1930_df <- mapply(make_climate_30_years_df, list_tmp_1901_1930, list_pre_1901_1930,SIMPLIFY = FALSE)
 list_climate_1967_1996_df <- mapply(make_climate_30_years_df, list_tmp_1967_1996, list_pre_1967_1996, SIMPLIFY = FALSE)
 
-View(list_climate_1901_1930_df[[1]])
+#View(list_climate_1901_1930_df[[1]])
 
 ```
 
 ```{r}
+#funkcja do tworzenia klimatogramów przy użyciu funkcji climateGraph() z pakietu berryFunctions
 plot_climate <- function(df, title) {
   climateGraph(
   temp = df$temperatura,
@@ -117,6 +133,7 @@ plot_climate <- function(df, title) {
 )
 }
 
+#tworzymy listy zawierające tytuły wykresów
 titles_1901_1930 <- c(
   "Okres 1901–1930 - pinus1",
   "Okres 1901–1930 – pinus2",
@@ -129,12 +146,14 @@ titles_1967_1996 <- c(
   "Okres 1967-1996 – pinus3"
 )
 
+#Generujemy klimatogramy za pomocą powyższej funkcji dla 3 lokalizacji i lat 1901-1930, 1967-1996
 mapply(plot_climate,list_climate_1901_1930_df, titles_1901_1930 )
 mapply(plot_climate,list_climate_1967_1996_df, titles_1967_1996 )
   
 ```
 
 ```{r}
+#Do porównania ze sobą czynników klimatycznych (temperatury i opadów) łączymy ze sobą dataframe'y z dwóch okresów)
 make_2periods_climate_df <- function(df1901,df1967) {
   df <- data.frame(
     miesiąc = factor(miesiace, levels = miesiace),
@@ -146,10 +165,12 @@ make_2periods_climate_df <- function(df1901,df1967) {
   return(df)
 }
 
+#Tworzymy listę zawierająca taki dataframe dla każdej z 3 lokalizacji
 list_2periods_climate_df <- mapply(make_2periods_climate_df, list_climate_1901_1930_df, list_climate_1967_1996_df, SIMPLIFY=FALSE)
 ```
 
 ```{r}
+#funkcja do tworzenia wykresu porównującego średnie miesięczne temperatury i sumy opadów
 plot_climate_2periods <- function(df) {
   p1 <- ggplot(df, aes(x = `miesiąc`, group = 1)) +
   geom_line(aes(y = tmp1901_1930, color = "1901–1930"), size = 1.1) +
@@ -173,12 +194,12 @@ plot_climate_2periods <- function(df) {
   klimatogram
 }
 
+#generujemy 3 takie wykresy (po jednym na lokalizację)
 lapply(list_2periods_climate_df, plot_climate_2periods)
 ```
 
 ```{r}
-# ZMIANA ŚREDNIEJ ROCZNEJ TEMP I OPADÓW
-
+#funkcja tworząca dataframe ze średnimi temperaturami na każdy rok z okresu 1901-1996
 mean_yearly <- function(dataframe) {
   df <- data.frame(
     rok = 1901:1996,
@@ -187,37 +208,74 @@ mean_yearly <- function(dataframe) {
   return(df)
 }
 
+#zastosowanie funkcji na dataframe'ach zawierających temperatury dla każdego miesiąca z lat 1901-1996
 list_mean_yearly_temp <- lapply(list_tmp_1901_1996_df, mean_yearly)
-list_mean_yearly_pre <- lapply(list_pre_1901_1996_df, mean_yearly)
-#View(list_mean_yearly_temp[[3]])
 
+#analogiczna funkcja tylko tworząca dataframe z roczną sumą opadów
+sum_yearly <- function(dataframe) {
+  df <- data.frame(
+    rok = 1901:1996,
+    sum_pre = rowSums(dataframe[,-1],na.rm=TRUE)
+  )
+  return(df)
+}
+
+#zastosowanie na dataframe'ach z opadami dla każdego miesiąca
+list_mean_yearly_pre <- lapply(list_pre_1901_1996_df, sum_yearly)
+
+#tworzenie wykresów liniowych przedstawiających średnie roczne temperatury na przestrzeni lat z dodanym trendem liniowym lm
 for (n in 1:3) {
   plot <- ggplot(list_mean_yearly_temp[[n]], aes(rok, sr_temp)) + geom_line(color='red') + geom_smooth(method="lm", color='red') + labs( x='Rok', y="Średnia temperatura [°C]")
   print(plot)
 }
+
+#tworzenie wykresów liniowych przedstawiających roczne sumy opadów na przestrzeni lat z dodanym trendem liniowym lm
 for (n in 1:3) {
-  plot <- ggplot(list_mean_yearly_pre[[n]], aes(rok, sr_temp)) + geom_line(color='blue') + geom_smooth(method="lm", color='blue') + labs( x='Rok', y="Średnie roczne opady [mm]")
+  plot <- ggplot(list_mean_yearly_pre[[n]], aes(rok, sum_pre)) + geom_line(color='blue') + geom_smooth(method="lm", color='blue') + labs( x='Rok', y="Roczne opady [mm]")
   print(plot)
 }
 
 
 
-
 ```
-```{r}
-## czy trend linowy jest istotny statycztycznie?
 
+```{r}
+#wyświetlenie statystyk w celu sprawdzenia, czy trendy liniowe jest istotny statystycznie
 for (n in 1:3) {
-  print(paste("Temperatura: Pinus",n, "trend liniowy"))
+  print(paste("Temperatura: Pinus",n, "trend liniowy")) 
   lm <- lm(list_mean_yearly_temp[[n]]$sr_temp~list_mean_yearly_temp[[n]]$rok)
   print(summary(lm))
 }
 
 for (n in 1:3) {
   print(paste("Opady: Pinus",n, "trend liniowy"))
-  lm <- lm(list_mean_yearly_pre[[n]]$sr_temp~list_mean_yearly_pre[[n]]$rok)
+  lm <- lm(list_mean_yearly_pre[[n]]$sum_pre~list_mean_yearly_pre[[n]]$rok)
   print(summary(lm))
 }
+
+```
+```{r}
+#pomimo dużego slope'a dla linii trendów opadów dla lokalizacji 1, jest to nieistotne statystycznie. Poniżej próba sprawdzenia, czy używając analizy punktów zmiany dostaniemy p-value<0,05
+library(segmented)
+
+  print("Opady: Pinus 1 trend liniowy")
+  df <- list_mean_yearly_pre[[1]]
+  
+  fit_lm <- lm(sum_pre ~ rok, data = df)
+  fit_seg <- segmented(fit_lm, seg.Z = ~ rok, npsi = 1)
+  
+  summary(mod_seg) #punkt zmiany - rok 1975
+  
+  #wykres do wizualizacji, gdzie wyznaczono punkt zmiany i jak wyglądają linie trendu  
+ plot(fit_seg, ylim=c(400,800), ylab="Suma opadów [mm]")
+ lines(df$rok, df$sum_pre)
+ lines.segmented(fit_seg)
+ points.segmented(fit_seg)
+ 
+ #interesuje nas czy trend liniowy po 1975 jest istotny statystycznie
+ df2 <- df[df$rok >= 1975, ]
+ model2 <- lm(sum_pre ~ rok, data = df2)
+ summary(model2) #pvalue>0,05 - nie jest istotny
 
 ```
 
